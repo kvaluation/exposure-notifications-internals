@@ -94,7 +94,7 @@ JNIEXPORT jint JNICALL JND(lastProcessedKeyCountNative)(JNIEnv *env,
                                                         jclass clazz,
                                                         jlong native_ptr) {
   if (native_ptr == 0) {
-    LOG_W("Invalid input for lastProcessedKeyCount");
+    LOG_W("Invalid input for lastProcessedKeyCount");　 //このへん
     return -1;
   }
 
