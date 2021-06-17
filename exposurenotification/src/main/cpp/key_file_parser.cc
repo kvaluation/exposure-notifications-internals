@@ -27,7 +27,7 @@ namespace exposure {
       }
       return true;
     }
-
+//このへん　nullptr
     std::unique_ptr<KeyFileIterator> CreateKeyFileIterator(
         const std::string &key_file) {
       FILE *file = fopen(key_file.c_str(), "rb");
