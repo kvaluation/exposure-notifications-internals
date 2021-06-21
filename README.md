@@ -3,16 +3,18 @@ EN API (さらされたお知らせ， 接触通知, 暴露通知, 被ばく通�
 
 This repository contains a snapshot of code from Google Play Services' [Exposure Notifications
  module][1]. 
+ 
  このリポジトリーは、GooglePlay開発者サービスの「接触通知モジュール」[1]のコードのスナップショット（写し）を含みます。
  
- It was published as part of a [transparency effort][5], and there are no current
- plans to update the code contained within the repo.
- コードは、透明性を高める努力の一環として公開されたもので、このリポジトリーに含まれるコードをアップデートする計画はありません。
+ It was published as part of a [transparency effort][5], and there are no current plans to update the code contained within the repo.
+
+コードは、透明性を高める努力の一環として公開されたもので、このリポジトリーに含まれるコードをアップデートする計画はありません。
 
 ## Key Features
 主な特徴
 
 There are a number of features in this source set, including abstrations and JNI. The following sections provide key features with pointers to the source code.
+
 このソースセットには、JNI (Java Native Interface) や抽象化など、多数の特徴があります。以下のセクションでは、主要な特徴をソースコードへのポインタ（引用）とともに紹介します。
 
 ### BLE MAC and RPI Rotation
@@ -21,11 +23,13 @@ BLE, MACとRPI（接触符号）の切り替え
 Code: [`com.google.samples.exposurenotification.ble.advertising.BleAdvertiser#startAdvertising`][2]
 
 Bluetooth Low Energy (BLE) MAC addresses rotate on average every 15 minutes to prevent remote location tracking that could be accomplished by tying together observations of a fixed MAC address.
+
 BLE (低電力Blutooth通信, iBeaconなど) のMACアドレスを、平均で15分ごとに切り替えることで、固定MACアドレスの観測の紐付けによりリモートで位置追跡されてしまうことを防いでいます。
 
 In order to best protect user privacy, the Exposure Notifications framework ensures that Rolling
 Proximity Identifiers (RPIs) are never rotated without also having a corresponding change of the
 Bluetooth MAC address.
+
 接触通知フレームワークは、ユーザーのプライバシーを最大限に保護するために、Bluetooth MACアドレスの変更に追従させずに、接触識別子(RPIs)を変更しないことを保証します。
 
 For more details, see the full [Bluetooth spec][3].
