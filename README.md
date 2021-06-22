@@ -1,12 +1,12 @@
 # Exposure Notifications API
 EN API (さらされたお知らせ， 接触通知, 暴露通知, 被ばく通知)
 
-This repository contains a snapshot of code from Google Play Services' [Exposure Notifications
- module][1]. 
+This repository contains a snapshot of code from Google Play Services' [Exposure Notifications module][1]. 
  
- このリポジトリーは、GooglePlay開発者サービスの「接触通知モジュール」[1]のコードのスナップショット（写し）を含みます。
+このリポジトリーは、GooglePlay開発者サービスの「接触通知モジュール」[1]のコードのスナップショット（写し）を含みます。
  
- It was published as part of a [transparency effort][5], and there are no current plans to update the code contained within the repo.
+
+It was published as part of a [transparency effort][5], and there are no current plans to update the code contained within the repo.
 
 コードは、透明性を高める努力の一環として公開されたもので、このリポジトリーに含まれるコードをアップデートする計画はありません。
 
@@ -18,7 +18,7 @@ There are a number of features in this source set, including abstrations and JNI
 このソースセットには、JNI (Java Native Interface) や抽象化など、多数の特徴があります。以下のセクションでは、主要な特徴をソースコードへのポインタ（引用）とともに紹介します。
 
 ### BLE MAC and RPI Rotation
-BLE, MACとRPI（接触符号）の切り替え
+BLE MACとRPI（接触符号）の切り替え
 
 Code: [`com.google.samples.exposurenotification.ble.advertising.BleAdvertiser#startAdvertising`][2]
 
@@ -26,22 +26,27 @@ Bluetooth Low Energy (BLE) MAC addresses rotate on average every 15 minutes to p
 
 BLE (低電力Blutooth通信, iBeaconなど) のMACアドレスを、平均で15分ごとに切り替えることで、固定MACアドレスの観測の紐付けによりリモートで位置追跡されてしまうことを防いでいます。
 
-In order to best protect user privacy, the Exposure Notifications framework ensures that Rolling
-Proximity Identifiers (RPIs) are never rotated without also having a corresponding change of the
-Bluetooth MAC address.
+In order to best protect user privacy, the Exposure Notifications framework ensures that Rolling Proximity Identifiers (RPIs) are never rotated without also having a corresponding change of the Bluetooth MAC address.
 
-接触通知フレームワークは、ユーザーのプライバシーを最大限に保護するために、Bluetooth MACアドレスの変更に追従させずに、接触識別子(RPIs)を変更しないことを保証します。
+接触通知フレームワークは、ユーザーのプライバシーを最大限に保護するために、Bluetooth MACアドレスの変更に伴わない接触識別子(RPIs)の変更をしないと保証します。
 
 For more details, see the full [Bluetooth spec][3].
 より詳細は、Bluetooth明細を参照してください。
 
 
-Because Android doesn't have a callback to notify an application that the Bluetooth MAC address
-is changing (or has changed), this is handled by explicitly stopping and restarting advertising
-whenever a new RPI is generated.
+Because Android doesn't have a callback to notify an application that the Bluetooth MAC address　is changing (or has changed), this is handled by explicitly stopping and restarting advertising　whenever a new RPI is generated.
 
-Since there isn't any callback, it is possible for the Bluetooth MAC address to rotate
-before a new RPI is generated. In this case the following would happen:
+Androidには、BluetoothのMACアドレスの変更をアプリケーションに通知するコールバックがありません。このため、新しいRPIが生成されるたびに、配信を明示的に止め、再開しています。
+
+
+Since there isn't any callback, it is possible for the Bluetooth MAC address to rotate before a new RPI is generated.
+
+コールバックがないために、新しいRPIが生成される前に、BluetoothのMACアドレスが変更になる可能性があります。
+
+
+ In this case the following would happen:
+ この場合、次のようになります:
+ 
 
 |Time | Bluetooth MAC | RPI |
 |-----|---------------|-----|
@@ -49,13 +54,18 @@ before a new RPI is generated. In this case the following would happen:
 | :09 | 00:00:00:02   | AAA |
 | :10 | 00:00:00:03   | BBB |
 
-The risk posed by this is minimal, since even though an observer may be able to tie the MAC
-addresses `00:00:00:01` and `00:00:00:02` together using the common RPI, the duration of both
-MAC addresses is no longer than a single RPI period (~10 minutes). When the RPI rotates, the
-MAC address rotates again, making it difficult to track the association of either the MAC
+
+The risk posed by this is minimal, since even though an observer may be able to tie the MAC addresses `00:00:00:01` and `00:00:00:02` together using the common RPI, the duration of both MAC addresses is no longer than a single RPI period (~10 minutes).
+
+(Bluetooth MACの)観測者が、同じＲＰＩ　（ＡＡＡ）　を使って、MACアドレス `00:00:00:01` と `00:00:00:02` を結びつけたとしても、両MACアドレスの継続時間は単一のRPI期間（約10分）よりも短いため、（追跡）リスクは最小限に抑えられます。
+
+When the RPI rotates, the MAC address rotates again, making it difficult to track the association of either the MAC
 address or RPI to a common device.
 
+RPIが変更すると、MACアドレスもさらに変更となるため、MACアドレスやRPIを使って共通のデバイスかどうかを追跡することは困難です。
+
 ### Rolling Proximity Identifier Generation
+回転近接識別子（RPI, 接触符号）の生成
 
 Code: [`com.google.samples.exposurenotification.ble.advertising.RollingProximityIdManager#getCurrentRollingProximityId`](exposurenotification/src/main/java/com/google/samples/exposurenotification/ble/advertising/RollingProximityIdManager.java)
 Code: [`com.google.samples.exposurenotification.data.generator.TemporaryExposureKeyGenerator`](exposurenotification/src/main/java/com/google/samples/exposurenotification/data/generator/TemporaryExposureKeyGenerator.java)
@@ -63,7 +73,10 @@ Code: [`com.google.samples.exposurenotification.data.generator.TemporaryExposure
 Rolling Proximity Identifiers (RPIs) are generated from a Temporary Exposure Key (TEK) based on the
 [Exposure Notification Cryptography Specification][4].
 
+回転近接識別子（RPI, 接触符号）は、「接触通知暗号仕様書」[4]に基づいて、一時的接触キー（TEK, 日次キー）から生成されます。
+
 For more information about TEKs and RPIs, see [Exposure Notifications Cryptography](CRYPTO.md#Temporary-Exposure-Key)
+TEKｓとＲＰＩｓの詳細は、「接触通知の暗号」を参照ください。
 
 ### Associated Encrypted Metadata
 
